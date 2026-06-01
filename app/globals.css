@@ -1,0 +1,163 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
+  --color-border: var(--border-color);
+  --color-card: var(--card);
+
+  --color-brand: var(--brand);
+  --color-brand-dark: var(--brand-dark);
+  --color-brand-soft: var(--brand-soft);
+
+  --font-sans: var(--font-bricolage);
+  --font-display: var(--font-bricolage);
+  --font-mono: var(--font-geist-mono);
+}
+
+:root {
+  --background: #0a0a0a;
+  --foreground: #f5f4f1;
+  --muted: #8a8a8a;
+  --subtle: #141414;
+  --border-color: #1f1f1f;
+  --card: #0f0f0f;
+
+  /* Electric ticket-platform yellow. */
+  --brand: #f4ff3a;
+  --brand-dark: #d9e324;
+  --brand-soft: rgba(244, 255, 58, 0.12);
+}
+
+html,
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+body {
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  font-feature-settings: "ss01", "ss02";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--brand);
+  color: #000;
+}
+
+/* === Buttons (2026 tactile style: pill + inset highlight + glow + press) === */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease,
+    color 0.18s ease;
+}
+.btn:active {
+  transform: translateY(0) scale(0.98);
+}
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn-sm {
+  font-size: 0.75rem;
+  padding: 0.625rem 1.125rem;
+}
+.btn-md {
+  font-size: 0.8125rem;
+  padding: 0.875rem 1.5rem;
+}
+.btn-lg {
+  font-size: 0.875rem;
+  padding: 1.0625rem 1.875rem;
+}
+
+.btn-primary {
+  background-color: var(--brand);
+  color: #000;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.12),
+    0 6px 22px -6px rgba(244, 255, 58, 0.55),
+    0 0 0 1px rgba(244, 255, 58, 0.5);
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  background-color: var(--brand);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18),
+    0 14px 36px -8px rgba(244, 255, 58, 0.78),
+    0 0 0 1px rgba(244, 255, 58, 0.65);
+}
+
+.btn-secondary {
+  background-color: var(--card);
+  color: var(--foreground);
+  border: 1px solid var(--border-color);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 1px 0 rgba(0, 0, 0, 0.4);
+}
+.btn-secondary:hover {
+  transform: translateY(-2px);
+  background-color: var(--subtle);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 10px 28px -12px rgba(0, 0, 0, 0.6);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--foreground);
+  border-radius: 0.5rem;
+}
+.btn-ghost:hover {
+  background: var(--subtle);
+}
+
+/* Marquee — used in the home page motion strip */
+@keyframes fc-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.fc-marquee {
+  animation: fc-marquee 40s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fc-marquee {
+    animation: none;
+  }
+}
+
+/* Tiny sticker rotation utilities used on badges */
+.fc-rotate-1 {
+  transform: rotate(-3deg);
+}
+.fc-rotate-2 {
+  transform: rotate(2deg);
+}
