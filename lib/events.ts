@@ -2,7 +2,7 @@ import "server-only";
 import { and, asc, desc, eq, ilike, or, sql } from "drizzle-orm";
 import { db } from "./db";
 import { contactMessages, events as eventsTable } from "./schema";
-import type { EventInput, EventStatus, FanEvent } from "./types";
+import type { EventInput, EventStatus, EventType, FanEvent } from "./types";
 
 type EventRow = typeof eventsTable.$inferSelect;
 
@@ -17,11 +17,16 @@ function mapRow(row: EventRow): FanEvent {
     startDate: row.startDate,
     endDate: row.endDate,
     category: row.category,
+    eventType: row.eventType as EventType,
     color: row.color,
     heroImage: row.heroImage,
     attendance: row.attendance,
     description: row.description,
     ticketUrl: row.ticketUrl,
+    ticketOptions: Array.isArray(row.ticketOptions) ? row.ticketOptions : [],
+    celebrityName: row.celebrityName,
+    celebrityBio: row.celebrityBio,
+    celebrityImage: row.celebrityImage,
     featured: row.featured,
     status: row.status as EventStatus,
     createdAt:

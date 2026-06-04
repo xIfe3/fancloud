@@ -1,5 +1,27 @@
 export type EventStatus = "upcoming" | "past" | "cancelled";
 
+export const EVENT_TYPES = [
+  "convention",
+  "meet_greet",
+  "tour",
+  "panel",
+  "signing",
+] as const;
+export type EventType = (typeof EVENT_TYPES)[number];
+
+export const EVENT_TYPE_LABELS: Record<EventType, string> = {
+  convention: "Convention",
+  meet_greet: "Meet & Greet",
+  tour: "Tour",
+  panel: "Panel",
+  signing: "Signing",
+};
+
+export interface TicketOption {
+  label: string;
+  url: string;
+}
+
 export interface FanEvent {
   id: number;
   slug: string;
@@ -10,11 +32,16 @@ export interface FanEvent {
   startDate: string; // ISO date: YYYY-MM-DD
   endDate: string; // ISO date: YYYY-MM-DD
   category: string;
+  eventType: EventType;
   color: string;
   heroImage: string | null;
   attendance: number | null;
   description: string;
   ticketUrl: string | null;
+  ticketOptions: TicketOption[];
+  celebrityName: string | null;
+  celebrityBio: string | null;
+  celebrityImage: string | null;
   featured: boolean;
   status: EventStatus;
   createdAt: string;
@@ -28,11 +55,16 @@ export interface EventInput {
   startDate: string;
   endDate: string;
   category: string;
+  eventType: EventType;
   color: string;
   heroImage: string | null;
   attendance: number | null;
   description: string;
   ticketUrl: string | null;
+  ticketOptions: TicketOption[];
+  celebrityName: string | null;
+  celebrityBio: string | null;
+  celebrityImage: string | null;
   featured: boolean;
   status: EventStatus;
 }

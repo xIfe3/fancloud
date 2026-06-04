@@ -8,6 +8,7 @@ import { Logo } from "./logo";
 
 const NAV = [
   { href: "/events", label: "Events" },
+  { href: "/fan-card", label: "Fan Card" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ];

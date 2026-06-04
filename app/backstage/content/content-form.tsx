@@ -1,11 +1,11 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import {
   saveContentAction,
   type ContentFormState,
 } from "./actions";
-import { CONTENT_KEYS, type ContentKey } from "@/lib/content";
+import { CONTENT_KEYS, type ContentKey } from "@/lib/content-keys";
 
 const initial: ContentFormState = {};
 
@@ -38,6 +38,46 @@ const SECTIONS: { title: string; keys: ContentKey[] }[] = [
     title: "Footer",
     keys: ["footer.tagline.big", "footer.tagline.small"],
   },
+  {
+    title: "Fan Card · page",
+    keys: [
+      "fancard.kicker",
+      "fancard.headline.line1",
+      "fancard.headline.line2",
+      "fancard.subcopy",
+    ],
+  },
+  {
+    title: "Fan Card · Regular",
+    keys: [
+      "fancard.regular.name",
+      "fancard.regular.tagline",
+      "fancard.regular.price",
+      "fancard.regular.perks",
+    ],
+  },
+  {
+    title: "Fan Card · VIP",
+    keys: [
+      "fancard.vip.name",
+      "fancard.vip.tagline",
+      "fancard.vip.price",
+      "fancard.vip.perks",
+    ],
+  },
+  {
+    title: "Customer care · email",
+    keys: ["admin.email"],
+  },
+  {
+    title: "Email templates",
+    keys: [
+      "contact.event.body",
+      "booking.event.body",
+      "fancard.regular.email.body",
+      "fancard.vip.email.body",
+    ],
+  },
 ];
 
 export function ContentForm({
@@ -49,68 +89,111 @@ export function ContentForm({
     saveContentAction,
     initial,
   );
+  const [active, setActive] = useState(SECTIONS[0].title);
 
   return (
-    <form action={formAction} className="space-y-12">
-      {SECTIONS.map((section) => (
-        <section key={section.title}>
-          <h2 className="border-b border-border pb-3 text-2xl font-bold tracking-tight">
-            {section.title}
-          </h2>
-          <div className="mt-6 space-y-5">
-            {section.keys.map((key) => {
-              const def = CONTENT_KEYS[key];
-              const value = current[key] ?? def.defaultValue;
-              return (
-                <div key={key}>
-                  <label
-                    htmlFor={key}
-                    className="mb-2 block font-mono text-xs uppercase tracking-widest text-muted"
-                  >
-                    {def.label}
-                  </label>
-                  {def.multiline ? (
-                    <textarea
-                      id={key}
-                      name={key}
-                      defaultValue={value}
-                      rows={4}
-                      className={`${field} resize-y`}
-                    />
-                  ) : (
-                    <input
-                      id={key}
-                      name={key}
-                      defaultValue={value}
-                      className={field}
-                    />
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      ))}
+    <form action={formAction}>
+      {/* TAB BAR — sticky so it stays in view while scrolling within a section */}
+      <div className="sticky top-16 z-20 -mx-4 mb-8 border-b border-border bg-background/95 px-4 backdrop-blur sm:-mx-6 sm:px-6">
+        <div className="-mb-px flex gap-1 overflow-x-auto scrollbar-thin">
+          {SECTIONS.map((section) => {
+            const isActive = section.title === active;
+            return (
+              <button
+                key={section.title}
+                type="button"
+                onClick={() => setActive(section.title)}
+                className={`shrink-0 whitespace-nowrap border-b-2 px-3 py-3 text-xs font-bold uppercase tracking-wider transition ${
+                  isActive
+                    ? "border-brand text-brand"
+                    : "border-transparent text-muted hover:text-foreground"
+                }`}
+              >
+                {section.title}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* SECTIONS — all rendered, only the active one visible.
+          We hide instead of unmount so typed-but-unsaved edits in other tabs
+          aren't lost when you switch tabs (the inputs stay in the form). */}
+      {SECTIONS.map((section) => {
+        const isActive = section.title === active;
+        return (
+          <section
+            key={section.title}
+            className={isActive ? "" : "hidden"}
+            aria-hidden={!isActive}
+          >
+            <header className="mb-6">
+              <p className="font-mono text-xs uppercase tracking-[0.3em] text-muted">
+                Editing
+              </p>
+              <h2 className="mt-1 text-2xl font-bold tracking-tight">
+                {section.title}
+              </h2>
+            </header>
+
+            <div className="space-y-5">
+              {section.keys.map((key) => {
+                const def = CONTENT_KEYS[key];
+                const value = current[key] ?? def.defaultValue;
+                return (
+                  <div key={key}>
+                    <label
+                      htmlFor={key}
+                      className="mb-2 block font-mono text-xs uppercase tracking-widest text-muted"
+                    >
+                      {def.label}
+                    </label>
+                    {def.multiline ? (
+                      <textarea
+                        id={key}
+                        name={key}
+                        defaultValue={value}
+                        rows={4}
+                        className={`${field} resize-y`}
+                      />
+                    ) : (
+                      <input
+                        id={key}
+                        name={key}
+                        defaultValue={value}
+                        className={field}
+                      />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        );
+      })}
 
       {state.error && (
-        <p className="border border-red-500/40 bg-red-500/10 px-4 py-2.5 text-sm font-medium text-red-300">
+        <p className="mt-8 border border-red-500/40 bg-red-500/10 px-4 py-2.5 text-sm font-medium text-red-300">
           {state.error}
         </p>
       )}
       {state.ok && (
-        <p className="border border-emerald-500/40 bg-emerald-500/10 px-4 py-2.5 text-sm font-medium text-emerald-300">
-          Content saved · changes are live.
+        <p className="mt-8 border border-emerald-500/40 bg-emerald-500/10 px-4 py-2.5 text-sm font-medium text-emerald-300">
+          Content saved · changes are live across every tab.
         </p>
       )}
 
-      <div className="sticky bottom-4">
+      <div className="sticky bottom-4 mt-10 flex items-center gap-3">
         <button
           type="submit"
           disabled={pending}
           className="btn btn-primary btn-md"
         >
-          {pending ? "Saving…" : "Save content →"}
+          {pending ? "Saving…" : "Save all content →"}
         </button>
+        <span className="font-mono text-[10px] uppercase tracking-widest text-muted">
+          Saves every tab at once
+        </span>
       </div>
     </form>
   );

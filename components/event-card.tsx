@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { FanEvent } from "@/lib/types";
+import { EVENT_TYPE_LABELS, type FanEvent } from "@/lib/types";
 import { formatAttendance, formatDateRange, readableText } from "@/lib/format";
 import { StarburstMark } from "./logo";
 
@@ -49,6 +49,11 @@ export function EventCard({ event }: { event: FanEvent }) {
               >
                 {event.category}
               </span>
+              {event.eventType !== "convention" && (
+                <span className="bg-black px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-brand">
+                  {EVENT_TYPE_LABELS[event.eventType]}
+                </span>
+              )}
               {event.featured && (
                 <span className="fc-rotate-2 bg-black px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-brand">
                   ★ Featured
@@ -79,6 +84,11 @@ export function EventCard({ event }: { event: FanEvent }) {
           {formatDateRange(event.startDate, event.endDate)}
         </p>
         <h3 className="mt-2 text-xl font-bold tracking-tight">{event.title}</h3>
+        {event.celebrityName && (
+          <p className="mt-1 text-sm font-bold text-brand">
+            ★ {event.celebrityName}
+          </p>
+        )}
         <p className="mt-1 text-sm text-muted">
           {event.venue}
           {attendance && (

@@ -9,8 +9,11 @@ import { logout } from "@/lib/auth";
 import { createEvent, deleteEvent, updateEvent } from "@/lib/events";
 import {
   DEFAULT_EVENT_COLOR,
+  EVENT_TYPES,
   type EventInput,
   type EventStatus,
+  type EventType,
+  type TicketOption,
 } from "@/lib/types";
 
 const STATUSES: EventStatus[] = ["upcoming", "past", "cancelled"];
@@ -51,6 +54,33 @@ async function saveUpload(file: File): Promise<string> {
   return `/uploads/${filename}`;
 }
 
+/** Generic helper: file > url > current > null, with optional explicit remove. */
+async function resolveImage(
+  formData: FormData,
+  fileKey: string,
+  urlKey: string,
+  removeKey: string,
+): Promise<string | null> {
+  if (formData.get(removeKey) === "on") return null;
+  const file = formData.get(fileKey) as File | null;
+  if (file && file.size > 0) return saveUpload(file);
+  const url = String(formData.get(urlKey) ?? "").trim();
+  return url || null;
+}
+
+function parseTicketOptions(formData: FormData): TicketOption[] {
+  const labels = formData.getAll("ticketOptionLabel").map((v) => String(v).trim());
+  const urls = formData.getAll("ticketOptionUrl").map((v) => String(v).trim());
+  const len = Math.max(labels.length, urls.length);
+  const out: TicketOption[] = [];
+  for (let i = 0; i < len; i++) {
+    const label = labels[i] ?? "";
+    const url = urls[i] ?? "";
+    if (label && url) out.push({ label, url });
+  }
+  return out;
+}
+
 export async function saveEventAction(
   _prevState: EventFormState,
   formData: FormData,
@@ -68,15 +98,16 @@ export async function saveEventAction(
   const colorRaw = String(formData.get("color") ?? "").trim();
   const color = /^#[0-9a-f]{6}$/i.test(colorRaw) ? colorRaw : DEFAULT_EVENT_COLOR;
   const statusRaw = String(formData.get("status") ?? "upcoming").trim();
+  const eventTypeRaw = String(formData.get("eventType") ?? "convention").trim();
 
-  const heroImageUrl = String(formData.get("heroImage") ?? "").trim();
-  const heroImageFile = formData.get("heroImageFile") as File | null;
-  const removeHeroImage = formData.get("removeHeroImage") === "on";
-
-  const ticketUrl = String(formData.get("ticketUrl") ?? "").trim() || null;
   const attendanceRaw = String(formData.get("attendance") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
   const featured = formData.get("featured") === "on";
+
+  const celebrityName =
+    String(formData.get("celebrityName") ?? "").trim() || null;
+  const celebrityBio =
+    String(formData.get("celebrityBio") ?? "").trim() || null;
 
   if (!title || !city || !venue || !startDate || !endDate || !category) {
     return {
@@ -89,6 +120,9 @@ export async function saveEventAction(
   const status: EventStatus = STATUSES.includes(statusRaw as EventStatus)
     ? (statusRaw as EventStatus)
     : "upcoming";
+  const eventType: EventType = EVENT_TYPES.includes(eventTypeRaw as EventType)
+    ? (eventTypeRaw as EventType)
+    : "convention";
 
   const attendance =
     attendanceRaw && !Number.isNaN(Number(attendanceRaw))
@@ -96,17 +130,25 @@ export async function saveEventAction(
       : null;
 
   let heroImage: string | null;
-  if (removeHeroImage) {
-    heroImage = null;
-  } else if (heroImageFile && heroImageFile.size > 0) {
-    try {
-      heroImage = await saveUpload(heroImageFile);
-    } catch (err) {
-      return { error: err instanceof Error ? err.message : "Image upload failed." };
-    }
-  } else {
-    heroImage = heroImageUrl || null;
+  let celebrityImage: string | null;
+  try {
+    heroImage = await resolveImage(
+      formData,
+      "heroImageFile",
+      "heroImage",
+      "removeHeroImage",
+    );
+    celebrityImage = await resolveImage(
+      formData,
+      "celebrityImageFile",
+      "celebrityImage",
+      "removeCelebrityImage",
+    );
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Image upload failed." };
   }
+
+  const ticketOptions = parseTicketOptions(formData);
 
   const input: EventInput = {
     title,
@@ -116,16 +158,32 @@ export async function saveEventAction(
     startDate,
     endDate,
     category,
+    eventType,
     color,
     heroImage,
     attendance,
     description,
-    ticketUrl,
+    ticketUrl: null, // legacy field — ticketOptions replaces it
+    ticketOptions,
+    celebrityName,
+    celebrityBio,
+    celebrityImage,
     featured,
     status,
   };
 
-  const saved = id ? await updateEvent(id, input) : await createEvent(input);
+  let saved: Awaited<ReturnType<typeof updateEvent>>;
+  try {
+    saved = id ? await updateEvent(id, input) : await createEvent(input);
+  } catch (err) {
+    console.error("Save event failed:", err);
+    return {
+      error:
+        err instanceof Error
+          ? `Save failed: ${err.message}`
+          : "Save failed. Check the dev server log for details.",
+    };
+  }
   if (!saved) {
     return { error: "That event no longer exists." };
   }
