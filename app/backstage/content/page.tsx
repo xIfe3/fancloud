@@ -13,7 +13,7 @@ export default async function ContentPage() {
   for (const [k, v] of map) current[k] = v;
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
+    <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
       <p className="font-mono text-xs uppercase tracking-[0.3em] text-muted">
         Backstage · Content
       </p>

@@ -5,12 +5,16 @@ import {
   saveContentAction,
   type ContentFormState,
 } from "./actions";
-import { CONTENT_KEYS, type ContentKey } from "@/lib/content-keys";
+import {
+  CONTENT_KEYS,
+  type ContentKey,
+  type ContentKeyDef,
+} from "@/lib/content-keys";
 
 const initial: ContentFormState = {};
 
 const field =
-  "w-full border border-border bg-card px-3.5 py-2.5 text-sm font-medium outline-none transition placeholder:text-muted focus:border-brand";
+  "w-full border border-border bg-card px-4 py-3 text-sm font-medium leading-relaxed outline-none transition placeholder:text-muted focus:border-brand";
 
 const SECTIONS: { title: string; keys: ContentKey[] }[] = [
   {
@@ -66,8 +70,8 @@ const SECTIONS: { title: string; keys: ContentKey[] }[] = [
     ],
   },
   {
-    title: "Customer care · email",
-    keys: ["admin.email"],
+    title: "Customer-care inboxes",
+    keys: ["admin.email", "admin.email.support", "admin.email.booking"],
   },
   {
     title: "Email templates",
@@ -93,9 +97,9 @@ export function ContentForm({
 
   return (
     <form action={formAction}>
-      {/* TAB BAR — sticky so it stays in view while scrolling within a section */}
-      <div className="sticky top-16 z-20 -mx-4 mb-8 border-b border-border bg-background/95 px-4 backdrop-blur sm:-mx-6 sm:px-6">
-        <div className="-mb-px flex gap-1 overflow-x-auto scrollbar-thin">
+      {/* TAB BAR */}
+      <div className="sticky top-16 z-20 -mx-4 mb-10 border-b border-border bg-background/95 px-4 backdrop-blur sm:-mx-6 sm:px-6">
+        <div className="-mb-px flex gap-1 overflow-x-auto">
           {SECTIONS.map((section) => {
             const isActive = section.title === active;
             return (
@@ -116,9 +120,7 @@ export function ContentForm({
         </div>
       </div>
 
-      {/* SECTIONS — all rendered, only the active one visible.
-          We hide instead of unmount so typed-but-unsaved edits in other tabs
-          aren't lost when you switch tabs (the inputs stay in the form). */}
+      {/* SECTIONS — all rendered, only the active one visible */}
       {SECTIONS.map((section) => {
         const isActive = section.title === active;
         return (
@@ -127,7 +129,7 @@ export function ContentForm({
             className={isActive ? "" : "hidden"}
             aria-hidden={!isActive}
           >
-            <header className="mb-6">
+            <header className="mb-8">
               <p className="font-mono text-xs uppercase tracking-[0.3em] text-muted">
                 Editing
               </p>
@@ -136,25 +138,37 @@ export function ContentForm({
               </h2>
             </header>
 
-            <div className="space-y-5">
+            <div className="space-y-10">
               {section.keys.map((key) => {
-                const def = CONTENT_KEYS[key];
+                // Widen the literal-typed entry so we can read the optional
+                // hint / placeholders / rows fields uniformly.
+                const def: ContentKeyDef = CONTENT_KEYS[key];
                 const value = current[key] ?? def.defaultValue;
+                const rows = def.rows ?? (def.multiline ? 6 : undefined);
+
                 return (
-                  <div key={key}>
-                    <label
-                      htmlFor={key}
-                      className="mb-2 block font-mono text-xs uppercase tracking-widest text-muted"
-                    >
-                      {def.label}
-                    </label>
+                  <div key={key} className="space-y-3">
+                    {/* Label + hint */}
+                    <div>
+                      <label
+                        htmlFor={key}
+                        className="block text-sm font-bold tracking-tight"
+                      >
+                        {def.label}
+                      </label>
+                      {def.hint && (
+                        <p className="mt-1.5 text-xs text-muted">{def.hint}</p>
+                      )}
+                    </div>
+
+                    {/* Input / textarea */}
                     {def.multiline ? (
                       <textarea
                         id={key}
                         name={key}
                         defaultValue={value}
-                        rows={4}
-                        className={`${field} resize-y`}
+                        rows={rows}
+                        className={`${field} font-mono resize-y`}
                       />
                     ) : (
                       <input
@@ -163,6 +177,24 @@ export function ContentForm({
                         defaultValue={value}
                         className={field}
                       />
+                    )}
+
+                    {/* Placeholder chips */}
+                    {def.placeholders && def.placeholders.length > 0 && (
+                      <div className="flex flex-wrap items-center gap-2 pt-1">
+                        <span className="font-mono text-[10px] uppercase tracking-widest text-muted">
+                          Placeholders:
+                        </span>
+                        {def.placeholders.map((p) => (
+                          <code
+                            key={p}
+                            className="border border-border bg-card px-2 py-0.5 font-mono text-[11px] text-brand"
+                            title="Paste this exact text into the body where you want the value to appear."
+                          >
+                            {`{${p}}`}
+                          </code>
+                        ))}
+                      </div>
                     )}
                   </div>
                 );
@@ -173,17 +205,17 @@ export function ContentForm({
       })}
 
       {state.error && (
-        <p className="mt-8 border border-red-500/40 bg-red-500/10 px-4 py-2.5 text-sm font-medium text-red-300">
+        <p className="mt-10 border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm font-medium text-red-300">
           {state.error}
         </p>
       )}
       {state.ok && (
-        <p className="mt-8 border border-emerald-500/40 bg-emerald-500/10 px-4 py-2.5 text-sm font-medium text-emerald-300">
+        <p className="mt-10 border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm font-medium text-emerald-300">
           Content saved · changes are live across every tab.
         </p>
       )}
 
-      <div className="sticky bottom-4 mt-10 flex items-center gap-3">
+      <div className="sticky bottom-4 mt-12 flex flex-wrap items-center gap-3">
         <button
           type="submit"
           disabled={pending}

@@ -46,6 +46,36 @@ export function formatAttendance(n: number | null): string | null {
   return `${n.toLocaleString("en-US")}+`;
 }
 
+/** "Jun 6, 2026 · 14:32" — concise absolute timestamp for admin lists. */
+export function formatTimestamp(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  const month = MONTHS[d.getMonth()];
+  const day = d.getDate();
+  const year = d.getFullYear();
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  return `${month} ${day}, ${year} · ${hh}:${mm}`;
+}
+
+/** "2 hours ago", "5 minutes ago", "just now" — relative for recency cues. */
+export function formatRelative(iso: string): string {
+  const then = new Date(iso).getTime();
+  if (Number.isNaN(then)) return iso;
+  const seconds = Math.floor((Date.now() - then) / 1000);
+  if (seconds < 60) return "just now";
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 30) return `${days} day${days === 1 ? "" : "s"} ago`;
+  const months = Math.floor(days / 30);
+  if (months < 12) return `${months} month${months === 1 ? "" : "s"} ago`;
+  const years = Math.floor(days / 365);
+  return `${years} year${years === 1 ? "" : "s"} ago`;
+}
+
 /** Returns black or white depending on which reads better on `hex`. */
 export function readableText(hex: string): "#000000" | "#ffffff" {
   const m = /^#?([a-f\d]{6})$/i.exec(hex.trim());

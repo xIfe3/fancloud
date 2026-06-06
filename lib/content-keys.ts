@@ -103,11 +103,23 @@ export const CONTENT_KEYS = {
     multiline: false,
   },
 
-  // -------------------- ADMIN --------------------
+  // -------------------- INBOXES --------------------
   "admin.email": {
-    label: "Customer-care email",
-    hint: "Used by every mailto button on the site (contact, booking, fan-card applications).",
+    label: "Hello / general inbox",
+    hint: "Shown on the contact page as the 'General' line. Also receives 'Contact us about this event' and fan-card application emails.",
     defaultValue: "hello@fancloud.example",
+    multiline: false,
+  },
+  "admin.email.support": {
+    label: "Support inbox",
+    hint: "Shown on the contact page as the 'Support' line. Use this for customer-service / help inquiries.",
+    defaultValue: "support@fancloud.example",
+    multiline: false,
+  },
+  "admin.email.booking": {
+    label: "Event bookings inbox",
+    hint: "Where the 'Book now' button on every event detail page sends ticket-booking requests.",
+    defaultValue: "bookings@fancloud.example",
     multiline: false,
   },
 

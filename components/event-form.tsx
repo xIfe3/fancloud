@@ -240,8 +240,8 @@ export function EventForm({ event }: { event?: FanEvent }) {
 
         {/* Hero image */}
         <div>
-          <label className={labelClass}>
-            Hero image <span className="normal-case tracking-normal">(optional)</span>
+          <label htmlFor="heroImage" className={labelClass}>
+            Hero image URL <span className="normal-case tracking-normal">(optional)</span>
           </label>
 
           {event?.heroImage && (
@@ -255,42 +255,18 @@ export function EventForm({ event }: { event?: FanEvent }) {
               <div className="flex-1 text-xs text-muted">
                 <p className="font-mono uppercase tracking-widest">Current image</p>
                 <p className="mt-1 break-all">{event.heroImage}</p>
-                <label className="mt-2 inline-flex items-center gap-2 text-xs font-medium text-red-300">
-                  <input
-                    type="checkbox"
-                    name="removeHeroImage"
-                    className="size-3.5"
-                  />
-                  Remove this image
-                </label>
               </div>
             </div>
           )}
 
           <input
-            id="heroImageFile"
-            name="heroImageFile"
-            type="file"
-            accept="image/png,image/jpeg,image/webp,image/gif,image/avif"
-            className="block w-full text-sm text-muted file:mr-4 file:border-0 file:bg-brand file:px-4 file:py-2 file:text-xs file:font-bold file:uppercase file:tracking-wide file:text-black hover:file:bg-brand-dark"
+            id="heroImage"
+            name="heroImage"
+            type="text"
+            defaultValue={event?.heroImage ?? ""}
+            className={field}
+            placeholder="https://… or /uploads/… (clear to fall back to the block color)"
           />
-          <p className="mt-2 font-mono text-[10px] uppercase tracking-widest text-muted">
-            PNG, JPEG, WEBP, GIF, or AVIF · Max 5 MB · Leave blank to keep the block color
-          </p>
-
-          <details className="mt-3">
-            <summary className="cursor-pointer font-mono text-xs uppercase tracking-widest text-muted">
-              Or use an image URL
-            </summary>
-            <input
-              id="heroImage"
-              name="heroImage"
-              type="url"
-              defaultValue={event?.heroImage ?? ""}
-              className={`${field} mt-2`}
-              placeholder="https://…"
-            />
-          </details>
         </div>
 
         {/* Description */}
@@ -349,7 +325,9 @@ export function EventForm({ event }: { event?: FanEvent }) {
         </div>
 
         <div>
-          <label className={labelClass}>Photo</label>
+          <label htmlFor="celebrityImage" className={labelClass}>
+            Photo URL <span className="normal-case tracking-normal">(optional)</span>
+          </label>
 
           {event?.celebrityImage && (
             <div className="mb-3 flex items-start gap-4 border border-border bg-card p-3">
@@ -362,37 +340,18 @@ export function EventForm({ event }: { event?: FanEvent }) {
               <div className="flex-1 text-xs text-muted">
                 <p className="font-mono uppercase tracking-widest">Current photo</p>
                 <p className="mt-1 break-all">{event.celebrityImage}</p>
-                <label className="mt-2 inline-flex items-center gap-2 text-xs font-medium text-red-300">
-                  <input
-                    type="checkbox"
-                    name="removeCelebrityImage"
-                    className="size-3.5"
-                  />
-                  Remove this photo
-                </label>
               </div>
             </div>
           )}
 
           <input
-            name="celebrityImageFile"
-            type="file"
-            accept="image/png,image/jpeg,image/webp,image/gif,image/avif"
-            className="block w-full text-sm text-muted file:mr-4 file:border-0 file:bg-brand file:px-4 file:py-2 file:text-xs file:font-bold file:uppercase file:tracking-wide file:text-black hover:file:bg-brand-dark"
+            id="celebrityImage"
+            name="celebrityImage"
+            type="text"
+            defaultValue={event?.celebrityImage ?? ""}
+            className={field}
+            placeholder="https://… or /uploads/…"
           />
-
-          <details className="mt-3">
-            <summary className="cursor-pointer font-mono text-xs uppercase tracking-widest text-muted">
-              Or use a photo URL
-            </summary>
-            <input
-              name="celebrityImage"
-              type="url"
-              defaultValue={event?.celebrityImage ?? ""}
-              className={`${field} mt-2`}
-              placeholder="https://…"
-            />
-          </details>
         </div>
       </section>
 

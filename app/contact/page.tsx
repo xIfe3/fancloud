@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ContactForm } from "@/components/contact-form";
+import { getAllContent, pick } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -7,14 +8,14 @@ export const metadata: Metadata = {
     "Get in touch with FANCLOUD about tickets, exhibiting, press, or partnerships.",
 };
 
-const DETAILS = [
-  { label: "General", value: "hello@fancloud.example" },
-  { label: "Talent & guest booking", value: "talent@fancloud.example" },
-  { label: "Exhibitors", value: "exhibits@fancloud.example" },
-  { label: "Press", value: "press@fancloud.example" },
-];
+export default async function ContactPage() {
+  const content = await getAllContent();
 
-export default function ContactPage() {
+  const details = [
+    { label: "Hello", value: pick(content, "admin.email") },
+    { label: "Support", value: pick(content, "admin.email.support") },
+  ];
+
   return (
     <div>
       <section className="border-b border-border">
@@ -39,12 +40,22 @@ export default function ContactPage() {
               Direct lines
             </p>
             <dl className="mt-6 divide-y divide-border border-y border-border">
-              {DETAILS.map((d) => (
-                <div key={d.label} className="flex items-center justify-between gap-4 py-5">
+              {details.map((d) => (
+                <div
+                  key={d.label}
+                  className="flex items-center justify-between gap-4 py-5"
+                >
                   <dt className="font-mono text-xs uppercase tracking-widest text-muted">
                     {d.label}
                   </dt>
-                  <dd className="font-bold text-brand">{d.value}</dd>
+                  <dd>
+                    <a
+                      href={`mailto:${d.value}`}
+                      className="font-bold text-brand transition hover:text-brand-dark"
+                    >
+                      {d.value}
+                    </a>
+                  </dd>
                 </div>
               ))}
             </dl>

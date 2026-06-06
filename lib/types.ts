@@ -1,3 +1,12 @@
+export interface ContactMessage {
+  id: number;
+  name: string;
+  email: string;
+  subject: string | null;
+  message: string;
+  createdAt: string;
+}
+
 export type EventStatus = "upcoming" | "past" | "cancelled";
 
 export const EVENT_TYPES = [

@@ -1,8 +1,5 @@
 "use server";
 
-import { randomUUID } from "node:crypto";
-import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { logout } from "@/lib/auth";
@@ -18,15 +15,6 @@ import {
 
 const STATUSES: EventStatus[] = ["upcoming", "past", "cancelled"];
 
-const MAX_UPLOAD_BYTES = 5 * 1024 * 1024; // 5 MB
-const ALLOWED_IMAGE_TYPES = new Set([
-  "image/png",
-  "image/jpeg",
-  "image/webp",
-  "image/gif",
-  "image/avif",
-]);
-
 export interface EventFormState {
   error?: string;
 }
@@ -36,36 +24,6 @@ function revalidateAll(slug?: string) {
   revalidatePath("/events");
   revalidatePath("/backstage");
   if (slug) revalidatePath(`/events/${slug}`);
-}
-
-async function saveUpload(file: File): Promise<string> {
-  if (file.size > MAX_UPLOAD_BYTES) {
-    throw new Error("Image is too large. Max 5 MB.");
-  }
-  if (!ALLOWED_IMAGE_TYPES.has(file.type)) {
-    throw new Error("Unsupported image type. Use PNG, JPEG, WEBP, GIF, or AVIF.");
-  }
-  const ext = file.type.split("/")[1] ?? "bin";
-  const filename = `${randomUUID()}.${ext}`;
-  const dir = path.join(process.cwd(), "public", "uploads");
-  await mkdir(dir, { recursive: true });
-  const buffer = Buffer.from(await file.arrayBuffer());
-  await writeFile(path.join(dir, filename), buffer);
-  return `/uploads/${filename}`;
-}
-
-/** Generic helper: file > url > current > null, with optional explicit remove. */
-async function resolveImage(
-  formData: FormData,
-  fileKey: string,
-  urlKey: string,
-  removeKey: string,
-): Promise<string | null> {
-  if (formData.get(removeKey) === "on") return null;
-  const file = formData.get(fileKey) as File | null;
-  if (file && file.size > 0) return saveUpload(file);
-  const url = String(formData.get(urlKey) ?? "").trim();
-  return url || null;
 }
 
 function parseTicketOptions(formData: FormData): TicketOption[] {
@@ -100,6 +58,14 @@ export async function saveEventAction(
   const statusRaw = String(formData.get("status") ?? "upcoming").trim();
   const eventTypeRaw = String(formData.get("eventType") ?? "convention").trim();
 
+  // Images are URL strings only — no filesystem writes. The runtime filesystem
+  // is read-only on Vercel, so any disk-write attempt would crash with ENOENT.
+  // For hosted upload, add a separate route handler that pushes to Vercel Blob
+  // (or similar) and writes the returned URL into these fields.
+  const heroImage = String(formData.get("heroImage") ?? "").trim() || null;
+  const celebrityImage =
+    String(formData.get("celebrityImage") ?? "").trim() || null;
+
   const attendanceRaw = String(formData.get("attendance") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
   const featured = formData.get("featured") === "on";
@@ -128,25 +94,6 @@ export async function saveEventAction(
     attendanceRaw && !Number.isNaN(Number(attendanceRaw))
       ? Math.max(0, Math.round(Number(attendanceRaw)))
       : null;
-
-  let heroImage: string | null;
-  let celebrityImage: string | null;
-  try {
-    heroImage = await resolveImage(
-      formData,
-      "heroImageFile",
-      "heroImage",
-      "removeHeroImage",
-    );
-    celebrityImage = await resolveImage(
-      formData,
-      "celebrityImageFile",
-      "celebrityImage",
-      "removeCelebrityImage",
-    );
-  } catch (err) {
-    return { error: err instanceof Error ? err.message : "Image upload failed." };
-  }
 
   const ticketOptions = parseTicketOptions(formData);
 
@@ -181,7 +128,7 @@ export async function saveEventAction(
       error:
         err instanceof Error
           ? `Save failed: ${err.message}`
-          : "Save failed. Check the dev server log for details.",
+          : "Save failed. Check the server log for details.",
     };
   }
   if (!saved) {

@@ -31,9 +31,10 @@ export async function saveContentAction(
     return { error: e instanceof Error ? e.message : "Save failed." };
   }
 
-  revalidatePath("/");
-  revalidatePath("/about");
+  // Revalidate the entire layout — content is read across many pages
+  // (home, about, contact, fan-card, event details, footer in root layout),
+  // so refreshing the whole tree is the safest, simplest move.
+  revalidatePath("/", "layout");
   revalidatePath("/backstage/content");
-  // Footer is in the root layout, so every page picks up the new tagline.
   return { ok: true };
 }
