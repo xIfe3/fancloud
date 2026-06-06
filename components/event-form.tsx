@@ -12,6 +12,7 @@ import {
   type FanEvent,
 } from "@/lib/types";
 import { readableText } from "@/lib/format";
+import { ImageUploadField } from "./image-upload-field";
 
 const STATUSES = ["upcoming", "past", "cancelled"] as const;
 
@@ -241,31 +242,13 @@ export function EventForm({ event }: { event?: FanEvent }) {
         {/* Hero image */}
         <div>
           <label htmlFor="heroImage" className={labelClass}>
-            Hero image URL <span className="normal-case tracking-normal">(optional)</span>
+            Hero image <span className="normal-case tracking-normal">(optional)</span>
           </label>
-
-          {event?.heroImage && (
-            <div className="mb-3 flex items-start gap-4 border border-border bg-card p-3">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={event.heroImage}
-                alt=""
-                className="h-20 w-32 object-cover"
-              />
-              <div className="flex-1 text-xs text-muted">
-                <p className="font-mono uppercase tracking-widest">Current image</p>
-                <p className="mt-1 break-all">{event.heroImage}</p>
-              </div>
-            </div>
-          )}
-
-          <input
+          <ImageUploadField
             id="heroImage"
             name="heroImage"
-            type="text"
-            defaultValue={event?.heroImage ?? ""}
-            className={field}
-            placeholder="https://… or /uploads/… (clear to fall back to the block color)"
+            defaultValue={event?.heroImage}
+            previewClassName="h-24 w-40"
           />
         </div>
 
@@ -326,31 +309,13 @@ export function EventForm({ event }: { event?: FanEvent }) {
 
         <div>
           <label htmlFor="celebrityImage" className={labelClass}>
-            Photo URL <span className="normal-case tracking-normal">(optional)</span>
+            Photo <span className="normal-case tracking-normal">(optional)</span>
           </label>
-
-          {event?.celebrityImage && (
-            <div className="mb-3 flex items-start gap-4 border border-border bg-card p-3">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={event.celebrityImage}
-                alt=""
-                className="h-20 w-20 object-cover"
-              />
-              <div className="flex-1 text-xs text-muted">
-                <p className="font-mono uppercase tracking-widest">Current photo</p>
-                <p className="mt-1 break-all">{event.celebrityImage}</p>
-              </div>
-            </div>
-          )}
-
-          <input
+          <ImageUploadField
             id="celebrityImage"
             name="celebrityImage"
-            type="text"
-            defaultValue={event?.celebrityImage ?? ""}
-            className={field}
-            placeholder="https://… or /uploads/…"
+            defaultValue={event?.celebrityImage}
+            previewClassName="h-24 w-24"
           />
         </div>
       </section>
