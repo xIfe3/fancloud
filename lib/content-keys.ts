@@ -170,8 +170,6 @@ export const CONTENT_KEYS = {
     label: "Terms · body",
     hint: "Separate sections with a blank line. Lines that look like a heading (start with a capital letter and have no period at the end) get rendered slightly bolder.",
     defaultValue: [
-      "This page is placeholder text. Replace it with the terms your lawyer drafts for you before you go live.",
-      "",
       "1. Acceptance",
       "By using fancloud.org, attending a FANCLOUD event, or buying a ticket, you agree to these terms. If you don't agree, please don't use the site or attend our events.",
       "",
@@ -221,8 +219,6 @@ export const CONTENT_KEYS = {
     label: "Privacy · body",
     hint: "Separate sections with a blank line. Lines that look like a heading (start with a capital letter and have no period at the end) get rendered slightly bolder.",
     defaultValue: [
-      "This page is placeholder text. Replace it with the privacy policy your lawyer drafts for you before you go live.",
-      "",
       "What we collect",
       "When you fill in the contact form, your name, email, and message are sent directly to us via your mail app — we don't store them on our servers. When you click a 'Book now' or 'Contact about this event' button, the same applies. If you buy a ticket through one of our partners, we receive whatever they pass on (name, email, and basic order details).",
       "",
