@@ -43,8 +43,7 @@ export default async function EventDetailPage({
   ]);
   const more = allUpcoming.filter((e) => e.slug !== event.slug).slice(0, 3);
 
-  const helloEmail = pick(content, "admin.email");
-  const bookingEmail = pick(content, "admin.email.booking");
+  const siteEmail = pick(content, "admin.email");
   const contactTemplate = pick(content, "contact.event.body");
   const bookingTemplate = pick(content, "booking.event.body");
 
@@ -178,7 +177,7 @@ export default async function EventDetailPage({
                   </Link>
                 ) : (
                   <BookingButton
-                    adminEmail={bookingEmail}
+                    adminEmail={siteEmail}
                     bodyTemplate={bookingTemplate}
                     eventTitle={event.title}
                     eventCity={event.city}
@@ -188,7 +187,7 @@ export default async function EventDetailPage({
                 )}
 
                 <ContactEventButton
-                  adminEmail={helloEmail}
+                  adminEmail={siteEmail}
                   bodyTemplate={contactTemplate}
                   eventTitle={event.title}
                   eventCity={event.city}

@@ -87,10 +87,10 @@ export function Footer({
         <div className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-border pt-6 text-xs uppercase tracking-widest text-muted sm:flex-row sm:items-center">
           <p>© {new Date().getFullYear()} FANCLOUD · All rights reserved</p>
           <div className="flex gap-6">
-            <Link href="/" className="hover:text-brand">
+            <Link href="/terms" className="hover:text-brand">
               Terms
             </Link>
-            <Link href="/" className="hover:text-brand">
+            <Link href="/privacy" className="hover:text-brand">
               Privacy
             </Link>
           </div>

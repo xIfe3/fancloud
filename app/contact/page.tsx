@@ -10,11 +10,7 @@ export const metadata: Metadata = {
 
 export default async function ContactPage() {
   const content = await getAllContent();
-
-  const details = [
-    { label: "Hello", value: pick(content, "admin.email") },
-    { label: "Support", value: pick(content, "admin.email.support") },
-  ];
+  const email = pick(content, "admin.email");
 
   return (
     <div>
@@ -37,31 +33,26 @@ export default async function ContactPage() {
         <div className="grid gap-12 lg:grid-cols-[1fr_1.4fr]">
           <div>
             <p className="font-mono text-xs uppercase tracking-[0.3em] text-muted">
-              Direct lines
+              Direct line
             </p>
             <dl className="mt-6 divide-y divide-border border-y border-border">
-              {details.map((d) => (
-                <div
-                  key={d.label}
-                  className="flex items-center justify-between gap-4 py-5"
-                >
-                  <dt className="font-mono text-xs uppercase tracking-widest text-muted">
-                    {d.label}
-                  </dt>
-                  <dd>
-                    <a
-                      href={`mailto:${d.value}`}
-                      className="font-bold text-brand transition hover:text-brand-dark"
-                    >
-                      {d.value}
-                    </a>
-                  </dd>
-                </div>
-              ))}
+              <div className="flex items-center justify-between gap-4 py-5">
+                <dt className="font-mono text-xs uppercase tracking-widest text-muted">
+                  Email
+                </dt>
+                <dd>
+                  <a
+                    href={`mailto:${email}`}
+                    className="font-bold text-brand transition hover:text-brand-dark"
+                  >
+                    {email}
+                  </a>
+                </dd>
+              </div>
             </dl>
           </div>
 
-          <ContactForm />
+          <ContactForm adminEmail={email} />
         </div>
       </div>
     </div>

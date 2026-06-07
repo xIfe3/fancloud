@@ -1,7 +1,7 @@
 import "server-only";
 import { and, asc, desc, eq, ilike, or, sql } from "drizzle-orm";
 import { db } from "./db";
-import { contactMessages, events as eventsTable } from "./schema";
+import { events as eventsTable } from "./schema";
 import type { EventInput, EventStatus, EventType, FanEvent } from "./types";
 
 type EventRow = typeof eventsTable.$inferSelect;
@@ -187,11 +187,3 @@ export async function deleteEvent(id: number): Promise<boolean> {
   return rows.length > 0;
 }
 
-export async function saveContactMessage(msg: {
-  name: string;
-  email: string;
-  subject: string | null;
-  message: string;
-}): Promise<void> {
-  await db.insert(contactMessages).values(msg);
-}

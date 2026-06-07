@@ -1,38 +1,64 @@
 "use client";
 
-import { useActionState } from "react";
-import { submitContact, type ContactState } from "@/app/contact/actions";
+import { useState } from "react";
 import { CheckIcon } from "./icons";
-
-const initialState: ContactState = { ok: false };
 
 const fieldClass =
   "w-full border border-border bg-card px-4 py-3 text-sm font-medium outline-none transition placeholder:text-muted focus:border-brand";
 const labelClass =
   "mb-2 block font-mono text-xs uppercase tracking-widest text-muted";
 
-export function ContactForm() {
-  const [state, formAction, pending] = useActionState(
-    submitContact,
-    initialState,
-  );
+export function ContactForm({ adminEmail }: { adminEmail: string }) {
+  const [sent, setSent] = useState(false);
 
-  if (state.ok) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    const name = String(fd.get("name") ?? "").trim();
+    const email = String(fd.get("email") ?? "").trim();
+    const subject = String(fd.get("subject") ?? "").trim();
+    const message = String(fd.get("message") ?? "").trim();
+
+    if (!name || !email || !message) return;
+
+    const finalSubject = subject || `Message from ${name}`;
+    const body = [
+      `From: ${name} <${email}>`,
+      "",
+      message,
+    ].join("\n");
+
+    const href = `mailto:${encodeURIComponent(adminEmail)}?subject=${encodeURIComponent(finalSubject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = href;
+    setSent(true);
+  }
+
+  if (sent) {
     return (
       <div className="border border-border bg-card p-10 text-center">
         <span className="mx-auto grid size-14 place-items-center border border-brand bg-brand-soft text-brand">
           <CheckIcon className="size-6" />
         </span>
-        <h3 className="mt-5 text-2xl font-bold tracking-tight">Message sent.</h3>
+        <h3 className="mt-5 text-2xl font-bold tracking-tight">
+          Your mail app opened.
+        </h3>
         <p className="mt-2 text-muted">
-          Thanks for reaching out — we&apos;ll get back to you soon.
+          Finish sending the message from there. We&apos;ll reply to the email
+          address you wrote it from.
         </p>
+        <button
+          type="button"
+          onClick={() => setSent(false)}
+          className="mt-6 font-mono text-xs uppercase tracking-widest text-muted transition hover:text-brand"
+        >
+          ← Send another
+        </button>
       </div>
     );
   }
 
   return (
-    <form action={formAction} className="space-y-5">
+    <form onSubmit={handleSubmit} className="space-y-5">
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
           <label htmlFor="name" className={labelClass}>
@@ -74,15 +100,12 @@ export function ContactForm() {
         />
       </div>
 
-      {state.error && (
-        <p className="border border-red-500/40 bg-red-500/10 px-4 py-2.5 text-sm font-medium text-red-300">
-          {state.error}
-        </p>
-      )}
-
-      <button type="submit" disabled={pending} className="btn btn-primary btn-lg">
-        {pending ? "Sending…" : "Send message →"}
+      <button type="submit" className="btn btn-primary btn-lg">
+        Send message →
       </button>
+      <p className="font-mono text-[10px] uppercase tracking-widest text-muted">
+        Opens in your default mail app
+      </p>
     </form>
   );
 }

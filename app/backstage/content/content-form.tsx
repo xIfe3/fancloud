@@ -70,8 +70,21 @@ const SECTIONS: { title: string; keys: ContentKey[] }[] = [
     ],
   },
   {
-    title: "Customer-care inboxes",
-    keys: ["admin.email", "admin.email.support", "admin.email.booking"],
+    title: "Site email",
+    keys: ["admin.email"],
+  },
+  {
+    title: "Terms page",
+    keys: ["terms.kicker", "terms.headline", "terms.updated", "terms.body"],
+  },
+  {
+    title: "Privacy page",
+    keys: [
+      "privacy.kicker",
+      "privacy.headline",
+      "privacy.updated",
+      "privacy.body",
+    ],
   },
   {
     title: "Email templates",

@@ -34,12 +34,6 @@ export default async function BackstageLayout({
               >
                 Content
               </Link>
-              <Link
-                href="/backstage/messages"
-                className="px-3 py-2 font-mono text-xs uppercase tracking-widest text-foreground transition hover:text-brand"
-              >
-                Messages
-              </Link>
               <form action={logoutAction}>
                 <button
                   type="submit"
